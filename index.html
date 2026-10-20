@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PostSquare - Dark Theme Multi-Choice Card Creator</title>
+  <title>QuizCardGen - Dark Theme Multi-Choice Card & Carousel Creator</title>
   <meta name="description" content="Generate aesthetic 1:1 square dark theme cards for multiple choice questions, social posts, and carousel slides.">
   
   <!-- Modern Typography from Google Fonts -->
@@ -43,8 +43,8 @@
         </svg>
       </div>
       <div>
-        <h1 class="brand-title">PostSquare Studio</h1>
-        <p class="brand-sub">Dark Theme 1:1 Social Content Cards</p>
+        <h1 class="brand-title">QuizCardGen</h1>
+        <p class="brand-sub">Dark Theme 1:1 Social Content & LinkedIn Carousels</p>
       </div>
     </div>
 
@@ -900,22 +900,6 @@
                     </div>
                   </div>
 
-                  <!-- Legacy / 3-Point Bullets support (hidden by default unless user switches layout) -->
-                  <div class="li-explanation-list hidden" id="liExplanationList">
-                    <div class="li-exp-item">
-                      <span class="exp-bullet bronze" contenteditable="true" spellcheck="false" id="liBullet1">Bronze</span>
-                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp1">Raw, unaltered source data appended with full fidelity history.</span>
-                    </div>
-                    <div class="li-exp-item">
-                      <span class="exp-bullet silver" contenteditable="true" spellcheck="false" id="liBullet2">Silver</span>
-                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp2">Cleansed, validated, deduplicated, and enriched table schemas.</span>
-                    </div>
-                    <div class="li-exp-item">
-                      <span class="exp-bullet gold" contenteditable="true" spellcheck="false" id="liBullet3">Gold</span>
-                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp3">Aggregated business data marts and star schemas ready for BI/ML.</span>
-                    </div>
-                  </div>
-
                   <div class="li-post-cta" contenteditable="true" spellcheck="false" id="liPostCta">
                     🔖 Save this post for your next data architecture interview & Follow for more!
                   </div>
@@ -1026,11 +1010,37 @@
       <div class="modal-header">
         <div class="modal-title-group">
           <h3>⚡ Quick Paste / Bulk Import</h3>
-          <p>Paste any formatted question with A, B, C, D options to automatically update all 4 cards</p>
+          <p>Paste your question, options A–D, and explanations to auto-populate cards and Slide 8</p>
         </div>
         <button class="modal-close-btn" id="closePasteModalBtn">&times;</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Live Mapping Direction / Guide -->
+        <div class="paste-mapping-guide">
+          <div class="guide-header">📋 Where does your pasted text go?</div>
+          <div class="guide-grid">
+            <div class="guide-col">
+              <div class="guide-badge dynamic">Dynamic (Parsed from your text)</div>
+              <ul class="guide-list">
+                <li>• <strong>Question</strong> ➔ Slide 2 Scenario & Slide 3–6 Question Header</li>
+                <li>• <strong>Options A, B, C, D</strong> ➔ Slide 3, 4, 5, 6 & 4-Block Grid</li>
+                <li>• <strong>Correct Option ("That's right!")</strong> ➔ Slide 8 Hero Card (Auto-detected!)</li>
+                <li>• <strong>Other 3 Options</strong> ➔ Slide 8 "Why the other 3 fail" Traps</li>
+              </ul>
+            </div>
+            <div class="guide-col">
+              <div class="guide-badge template">Template (Customizable in Settings)</div>
+              <ul class="guide-list">
+                <li>• <strong>Slide 1 (Overall)</strong> ➔ Hook Title, Subtitle, Topic & Author</li>
+                <li>• <strong>Slide 2 Title & Hint</strong> ➔ Scenario Header & Pro-Tip Callout</li>
+                <li>• <strong>Slide 7 (Engagement)</strong> ➔ "Ready for the answer?", Comment prompt</li>
+                <li>• <strong>Slide 8 CTA</strong> ➔ "🔖 Save this post for your next interview..."</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <label for="bulkPasteInput" class="modal-label">Raw Text (Question + Options + Explanations):</label>
         <textarea id="bulkPasteInput" class="paste-textarea" rows="12" placeholder="A streaming ingestion pipeline receives web clickstream events containing occasional malformed JSON payloads. According to Medallion architecture principles, which layer should store this raw, unaltered dataset complete with its data quality flaws, and which subsequent layer is tasked with storing cleansed and enriched events?
 
@@ -1164,10 +1174,16 @@ Storing raw, unvalidated data directly in the Silver layer violates the Medallio
           <input type="text" id="drawerLiEngagementSub" class="form-input" value="Can you explain why the other 3 choices fail?">
         </div>
 
-        <!-- Slide 8 Customization -->
+        <!-- Slide 8: Dynamic Winning Answer & Explanations -->
         <div class="form-group">
-          <label for="drawerLiRevealAns">Slide 8: Correct Winning Answer:</label>
-          <select id="drawerLiRevealAns" class="custom-select">
+          <label>Slide 8: Correct Winning Option:</label>
+          <div class="pill-group" id="drawerCorrectOptionPills">
+            <button type="button" class="pill-btn" data-opt="A">Option A</button>
+            <button type="button" class="pill-btn active" data-opt="B">Option B</button>
+            <button type="button" class="pill-btn" data-opt="C">Option C</button>
+            <button type="button" class="pill-btn" data-opt="D">Option D</button>
+          </div>
+          <select id="drawerLiRevealAns" class="custom-select" style="margin-top:6px;">
             <option value="A">Option A</option>
             <option value="B" selected>Option B</option>
             <option value="C">Option C</option>
@@ -1177,7 +1193,7 @@ Storing raw, unvalidated data directly in the Silver layer violates the Medallio
 
         <div class="form-group">
           <label>Slide 8: Reveal Block Accent Color:</label>
-          <div class="color-palette-row">
+          <div class="color-palette-row" id="drawerRevealColorPalette">
             <button type="button" class="swatch-btn active" data-color="#10b981" style="background:#10b981;" title="Emerald Green"></button>
             <button type="button" class="swatch-btn" data-color="#06b6d4" style="background:#06b6d4;" title="Electric Cyan"></button>
             <button type="button" class="swatch-btn" data-color="#a855f7" style="background:#a855f7;" title="Royal Violet"></button>
@@ -1190,62 +1206,39 @@ Storing raw, unvalidated data directly in the Silver layer violates the Medallio
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Slide 8: Explanation Layout Format:</label>
-          <div class="pill-group" id="drawerRevealLayoutGroup">
-            <button type="button" class="pill-btn active layout-btn" data-layout="split">2-Block Split (Hero + 3 Traps)</button>
-            <button type="button" class="pill-btn layout-btn" data-layout="all4">All 4 Breakdown</button>
-            <button type="button" class="pill-btn layout-btn" data-layout="bullets">3 Key Points</button>
-          </div>
-        </div>
-
-        <div class="form-group option-form-group">
-          <label for="drawerExpA"><span class="badge-mini a">A</span> Option A Explanation (Why it's wrong):</label>
+        <div class="form-group option-form-group" id="groupExpA">
+          <label for="drawerExpA" id="labelExpA">
+            <span class="badge-mini a">A</span> Option A Explanation:
+            <span class="exp-status-tag" id="statusTagA">(Why it fails ✗)</span>
+          </label>
           <textarea id="drawerExpA" class="form-textarea opt-field" rows="2">The Gold layer is reserved for business-level aggregates and star-schema models rather than intermediate cleansed and conformed datasets.</textarea>
         </div>
 
-        <div class="form-group option-form-group">
-          <label for="drawerExpB"><span class="badge-mini b">B</span> Option B Explanation (Why it's correct):</label>
+        <div class="form-group option-form-group group-correct" id="groupExpB">
+          <label for="drawerExpB" id="labelExpB">
+            <span class="badge-mini b">B</span> Option B Explanation:
+            <span class="exp-status-tag is-correct" id="statusTagB">(Correct Answer ✓)</span>
+          </label>
           <textarea id="drawerExpB" class="form-textarea opt-field" rows="2">That's right! The Bronze layer retains raw historical data in its original form regardless of quality errors, whereas the Silver layer handles data cleansing, filtering, and contextual enrichment.</textarea>
         </div>
 
-        <div class="form-group option-form-group">
-          <label for="drawerExpC"><span class="badge-mini c">C</span> Option C Explanation (Why it's wrong):</label>
+        <div class="form-group option-form-group" id="groupExpC">
+          <label for="drawerExpC" id="labelExpC">
+            <span class="badge-mini c">C</span> Option C Explanation:
+            <span class="exp-status-tag" id="statusTagC">(Why it fails ✗)</span>
+          </label>
           <textarea id="drawerExpC" class="form-textarea opt-field" rows="2">The Bronze layer does not clean or transform incoming records, as doing so would erase the original source audit trail.</textarea>
         </div>
 
-        <div class="form-group option-form-group">
-          <label for="drawerExpD"><span class="badge-mini d">D</span> Option D Explanation (Why it's wrong):</label>
+        <div class="form-group option-form-group" id="groupExpD">
+          <label for="drawerExpD" id="labelExpD">
+            <span class="badge-mini d">D</span> Option D Explanation:
+            <span class="exp-status-tag" id="statusTagD">(Why it fails ✗)</span>
+          </label>
           <textarea id="drawerExpD" class="form-textarea opt-field" rows="2">Storing raw, unvalidated data directly in the Silver layer violates the Medallion progression, which relies on Bronze to isolate original source payloads.</textarea>
         </div>
 
-        <!-- Legacy Bullets (Optional fallback) -->
-        <details class="drawer-accordion">
-          <summary>Legacy 3-Point Bullets (Optional)</summary>
-          <div class="form-group" style="margin-top:8px;">
-            <label>Point 1 (Tag & Text):</label>
-            <div style="display:flex; gap:6px;">
-              <input type="text" id="drawerLiBullet1" class="form-input" style="width:90px; flex-shrink:0;" value="Bronze">
-              <input type="text" id="drawerLiExp1" class="form-input" style="flex:1;" value="Raw, unaltered source data appended with full fidelity history.">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Point 2 (Tag & Text):</label>
-            <div style="display:flex; gap:6px;">
-              <input type="text" id="drawerLiBullet2" class="form-input" style="width:90px; flex-shrink:0;" value="Silver">
-              <input type="text" id="drawerLiExp2" class="form-input" style="flex:1;" value="Cleansed, validated, deduplicated, and enriched table schemas.">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Point 3 (Tag & Text):</label>
-            <div style="display:flex; gap:6px;">
-              <input type="text" id="drawerLiBullet3" class="form-input" style="width:90px; flex-shrink:0;" value="Gold">
-              <input type="text" id="drawerLiExp3" class="form-input" style="flex:1;" value="Aggregated business data marts and star schemas ready for BI/ML.">
-            </div>
-          </div>
-        </details>
-
-        <div class="form-group" style="margin-top: 10px;">
+        <div class="form-group" style="margin-top: 12px;">
           <label for="drawerLiPostCta">Slide 8: Closing CTA Box:</label>
           <input type="text" id="drawerLiPostCta" class="form-input" value="🔖 Save this post for your next data architecture interview & Follow for more!">
         </div>

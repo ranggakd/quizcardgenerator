@@ -1,7 +1,7 @@
 /**
- * PostSquare Studio - Core Logic
+ * QuizCardGen - Core Logic
  * Handles 1:1 square block rendering, live editing, smart paste parsing,
- * theme management, and 1-click high-resolution PNG image exports.
+ * theme management, and 1-click high-resolution PNG & multi-page PDF exports.
  */
 
 // Default State initialized with user's example & 8-slide educational quiz carousel structure
@@ -15,7 +15,7 @@ const DEFAULT_STATE = {
   author: 'dataengineering',
   showQuotes: true,
   showGlow: true,
-  showCounter: false, // OFF by default as requested!
+  showCounter: false, // OFF by default
   exportResolution: 1080, // 1080x1080px Instagram / LinkedIn standard
   activeView: 'grid', // 'grid' (4-Block) | 'linkedin' (Document Carousel)
   liSlideIndex: 0, // 0 to 7 (8 slides total)
@@ -30,13 +30,6 @@ const DEFAULT_STATE = {
   liRevealAnswer: 'B',
   liRevealAnswerText: 'CORRECT ANSWER: OPTION B',
   liRevealColor: '#10b981', // Custom color choice: emerald, cyan, purple, amber, rose, or custom hex
-  liRevealLayout: 'split', // 'split' (2-block Hero + Traps) | 'all4' | 'bullets'
-  liBullet1: 'Bronze',
-  liExp1: 'Raw, unaltered source data appended with full fidelity history.',
-  liBullet2: 'Silver',
-  liExp2: 'Cleansed, validated, deduplicated, and enriched table schemas.',
-  liBullet3: 'Gold',
-  liExp3: 'Aggregated business data marts and star schemas ready for BI/ML.',
   liPostCta: '🔖 Save this post for your next data architecture interview & Follow for more!',
   liSlide2Tag: 'THE QUESTION / SCENARIO',
   liSlide7Tag: 'PAUSE & REFLECT',
@@ -73,22 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
    ========================================================================== */
 function loadState() {
   try {
-    const saved = localStorage.getItem('postsquare_app_state');
+    const saved = localStorage.getItem('quizcardgen_app_state') || localStorage.getItem('postsquare_app_state');
     if (saved) {
       const parsed = JSON.parse(saved);
       return { 
         ...DEFAULT_STATE, 
         ...parsed,
-        showCounter: parsed.showCounter === true, // Default to false unless explicitly on
+        showCounter: parsed.showCounter === true,
         cornerStyle: parsed.cornerStyle || 'square',
         liRevealColor: parsed.liRevealColor || '#10b981',
-        liRevealLayout: parsed.liRevealLayout || 'split',
-        liBullet1: parsed.liBullet1 || 'Bronze',
-        liExp1: parsed.liExp1 || parsed.liExpBronze || DEFAULT_STATE.liExp1,
-        liBullet2: parsed.liBullet2 || 'Silver',
-        liExp2: parsed.liExp2 || parsed.liExpSilver || DEFAULT_STATE.liExp2,
-        liBullet3: parsed.liBullet3 || 'Gold',
-        liExp3: parsed.liExp3 || parsed.liExpGold || DEFAULT_STATE.liExp3,
         options: {
           ...DEFAULT_STATE.options,
           ...(parsed.options || {})
@@ -107,7 +93,7 @@ function loadState() {
 
 function saveState() {
   try {
-    localStorage.setItem('postsquare_app_state', JSON.stringify(appState));
+    localStorage.setItem('quizcardgen_app_state', JSON.stringify(appState));
   } catch (err) {
     console.warn('Could not write to localStorage', err);
   }
@@ -175,22 +161,10 @@ function initDOM() {
   // LinkedIn Slide 8 (Reveal)
   const liSlide8Tag = document.getElementById('liSlide8Tag');
   const liRevealAnswerText = document.getElementById('liRevealAnswerText');
-  const liBullet1 = document.getElementById('liBullet1');
-  const liExp1 = document.getElementById('liExp1');
-  const liBullet2 = document.getElementById('liBullet2');
-  const liExp2 = document.getElementById('liExp2');
-  const liBullet3 = document.getElementById('liBullet3');
-  const liExp3 = document.getElementById('liExp3');
   const liPostCta = document.getElementById('liPostCta');
 
   if (liSlide8Tag) liSlide8Tag.innerText = appState.liSlide8Tag || 'ANSWER REVEAL & BREAKDOWN';
   if (liRevealAnswerText) liRevealAnswerText.innerText = appState.liRevealAnswerText || `CORRECT ANSWER: OPTION ${appState.liRevealAnswer || 'B'}`;
-  if (liBullet1) liBullet1.innerText = appState.liBullet1;
-  if (liExp1) liExp1.innerText = appState.liExp1;
-  if (liBullet2) liBullet2.innerText = appState.liBullet2;
-  if (liExp2) liExp2.innerText = appState.liExp2;
-  if (liBullet3) liBullet3.innerText = appState.liBullet3;
-  if (liExp3) liExp3.innerText = appState.liExp3;
   if (liPostCta) liPostCta.innerText = appState.liPostCta;
 
   // LinkedIn Header & Caption
@@ -247,12 +221,6 @@ function initDOM() {
   if (drawerEngagementText) drawerEngagementText.value = appState.liEngagementText;
   if (drawerEngagementSub) drawerEngagementSub.value = appState.liEngagementSub;
   if (drawerRevealAns) drawerRevealAns.value = appState.liRevealAnswer || 'B';
-  if (drawerBullet1) drawerBullet1.value = appState.liBullet1;
-  if (drawerExp1) drawerExp1.value = appState.liExp1;
-  if (drawerBullet2) drawerBullet2.value = appState.liBullet2;
-  if (drawerExp2) drawerExp2.value = appState.liExp2;
-  if (drawerBullet3) drawerBullet3.value = appState.liBullet3;
-  if (drawerExp3) drawerExp3.value = appState.liExp3;
   if (drawerPostCta) drawerPostCta.value = appState.liPostCta;
 
   // Set Theme & Selectors
@@ -301,7 +269,6 @@ function initDOM() {
   // Initialize Slide 8 (Hero Correct Answer + Traps Breakdown + Color + Layout)
   renderSlide8();
   applyRevealColor(appState.liRevealColor || '#10b981');
-  setRevealLayout(appState.liRevealLayout || 'split');
 
   showLiSlide(appState.liSlideIndex || 0);
   setViewMode(appState.activeView || 'grid');
@@ -710,12 +677,6 @@ function setupDrawerFormSync() {
     { inputId: 'drawerLiEngagementTitle', field: 'liEngagementTitle', targetId: 'liEngagementTitle' },
     { inputId: 'drawerLiEngagementText', field: 'liEngagementText', targetId: 'liEngagementText' },
     { inputId: 'drawerLiEngagementSub', field: 'liEngagementSub', targetId: 'liEngagementSub' },
-    { inputId: 'drawerLiBullet1', field: 'liBullet1', targetId: 'liBullet1' },
-    { inputId: 'drawerLiExp1', field: 'liExp1', targetId: 'liExp1' },
-    { inputId: 'drawerLiBullet2', field: 'liBullet2', targetId: 'liBullet2' },
-    { inputId: 'drawerLiExp2', field: 'liExp2', targetId: 'liExp2' },
-    { inputId: 'drawerLiBullet3', field: 'liBullet3', targetId: 'liBullet3' },
-    { inputId: 'drawerLiExp3', field: 'liExp3', targetId: 'liExp3' },
     { inputId: 'drawerLiPostCta', field: 'liPostCta', targetId: 'liPostCta' }
   ];
 
@@ -763,13 +724,21 @@ function setupDrawerFormSync() {
     });
   }
 
-  // Drawer Reveal Answer Select
+  // Drawer Reveal Answer Select & Pills
   const drawerRevealAns = document.getElementById('drawerLiRevealAns');
   if (drawerRevealAns) {
     drawerRevealAns.addEventListener('change', (e) => {
       updateRevealAnswer(e.target.value);
     });
   }
+
+  document.querySelectorAll('#drawerCorrectOptionPills .pill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const opt = btn.getAttribute('data-opt');
+      updateRevealAnswer(opt);
+      showToast(`Set winning answer: Option ${opt}`);
+    });
+  });
 
   // Drawer Swatch Color Buttons
   document.querySelectorAll('.color-palette-row .swatch-btn[data-color]').forEach(btn => {
@@ -787,15 +756,6 @@ function setupDrawerFormSync() {
       applyRevealColor(e.target.value);
     });
   }
-
-  // Drawer Reveal Layout Buttons (2-Block Split vs All 4 vs 3 Key Points)
-  document.querySelectorAll('#drawerRevealLayoutGroup .layout-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const layout = btn.getAttribute('data-layout');
-      setRevealLayout(layout);
-      showToast(`Layout changed: ${layout === 'split' ? '2-Block Split' : layout}`);
-    });
-  });
 
   // Drawer Explanations A, B, C, D
   ['A', 'B', 'C', 'D'].forEach(letter => {
@@ -1420,31 +1380,6 @@ function applyRevealColor(colorHex) {
   saveState();
 }
 
-function setRevealLayout(layout) {
-  if (!layout) layout = 'split';
-  appState.liRevealLayout = layout;
-
-  const heroBlock = document.getElementById('liCorrectHeroBlock');
-  const trapsBlock = document.getElementById('liTrapsBlock');
-  const legacyList = document.getElementById('liExplanationList');
-
-  if (layout === 'bullets') {
-    if (heroBlock) heroBlock.style.display = 'none';
-    if (trapsBlock) trapsBlock.style.display = 'none';
-    if (legacyList) legacyList.style.display = 'flex';
-  } else {
-    if (heroBlock) heroBlock.style.display = 'flex';
-    if (trapsBlock) trapsBlock.style.display = 'flex';
-    if (legacyList) legacyList.style.display = 'none';
-  }
-
-  document.querySelectorAll('#drawerRevealLayoutGroup .layout-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-layout') === layout);
-  });
-
-  saveState();
-}
-
 function renderSlide8() {
   const correctLetter = (appState.liRevealAnswer || 'B').toUpperCase();
 
@@ -1501,21 +1436,34 @@ function renderSlide8() {
     });
   }
 
-  // 4. Drawer explanations sync
+  // 4. Update Sidebar Explanation Labels & Tags dynamically!
   ['A', 'B', 'C', 'D'].forEach(letter => {
-    const input = document.getElementById(`drawerExp${letter}`);
-    if (input) {
-      input.value = appState.explanations[letter] || '';
+    const isCorrect = (letter === correctLetter);
+    const tagEl = document.getElementById(`statusTag${letter}`);
+    const inputEl = document.getElementById(`drawerExp${letter}`);
+    const groupEl = document.getElementById(`groupExp${letter}`) || inputEl?.closest('.option-form-group');
+
+    if (tagEl) {
+      tagEl.innerText = isCorrect ? '(Correct Answer ✓)' : '(Why it fails ✗)';
+      tagEl.className = `exp-status-tag ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+    }
+    if (groupEl) {
+      groupEl.classList.toggle('group-correct', isCorrect);
+    }
+    if (inputEl) {
+      inputEl.value = appState.explanations[letter] || '';
     }
   });
 
-  // 5. Drawer answer dropdown sync
+  // 5. Drawer answer pills & dropdown sync
+  document.querySelectorAll('#drawerCorrectOptionPills .pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-opt') === correctLetter);
+  });
   const selectEl = document.getElementById('drawerLiRevealAns');
   if (selectEl) selectEl.value = correctLetter;
 
   // 6. Apply styles
   applyRevealColor(appState.liRevealColor || '#10b981');
-  setRevealLayout(appState.liRevealLayout || 'split');
 }
 
 function updateRevealAnswer(letter) {

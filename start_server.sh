@@ -9,7 +9,7 @@ if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
     exit 0
 fi
 
-echo "🚀 Starting PostSquare Studio on http://localhost:$PORT ..."
+echo "🚀 Starting QuizCardGen on http://localhost:$PORT ..."
 (python3 -m http.server $PORT </dev/null >/dev/null 2>&1 &)
 disown
 
