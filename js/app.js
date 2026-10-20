@@ -39,6 +39,14 @@ const DEFAULT_STATE = {
   liPostCaption: 'How well do you know the Databricks Medallion Architecture? 💡 Swipe through this quiz carousel to test your lakehouse knowledge. Drop your answer in the comments before slide 8! 👇',
   liDocFilename: 'medallion_architecture_quiz.pdf',
   liViewMode: 'player', // 'player' | 'grid'
+  liSwipe1: 'Swipe to start 👉',
+  liSwipe2: 'Swipe for Option A 👉',
+  liSwipe3: 'Swipe for Option B 👉',
+  liSwipe4: 'Swipe for Option C 👉',
+  liSwipe5: 'Swipe for Option D 👉',
+  liSwipe6: 'Swipe for Answer Check 👉',
+  liSwipe7: 'Swipe for the Reveal 👉',
+  liSwipe8: 'End of Carousel 🎉',
   options: {
     A: 'The Landing layer stores raw data; the Gold layer stores cleansed events directly.',
     B: 'The Bronze layer stores the raw unaltered data; the Silver layer stores cleansed and enriched events.',
@@ -176,6 +184,14 @@ function initDOM() {
   if (liAuthorHeadline) liAuthorHeadline.innerText = appState.liAuthorHeadline;
   if (liPostCaption) liPostCaption.innerText = appState.liPostCaption;
   if (liDocFilename) liDocFilename.innerText = appState.liDocFilename;
+
+  // LinkedIn Slide 1-8 Swipe Prompts (Live In-Place Editable)
+  for (let i = 1; i <= 8; i++) {
+    const swipeEl = document.getElementById(`liSwipe${i}`);
+    if (swipeEl) {
+      swipeEl.innerText = appState[`liSwipe${i}`] || (DEFAULT_STATE[`liSwipe${i}`] || '');
+    }
+  }
 
   // Sync drawer form inputs
   const topicInput = document.getElementById('globalTopicInput');
@@ -633,6 +649,17 @@ function setupInPlaceEditing() {
       saveState();
     });
   });
+
+  // In-Place editing for Slide 1-8 Swipe Prompts
+  for (let i = 1; i <= 8; i++) {
+    const swipeEl = document.getElementById(`liSwipe${i}`);
+    if (swipeEl) {
+      swipeEl.addEventListener('input', () => {
+        appState[`liSwipe${i}`] = swipeEl.innerText;
+        saveState();
+      });
+    }
+  }
 
   // In-Place editing for Slide 8 Hero Option text
   const heroOptionText = document.getElementById('liCorrectOptionText');

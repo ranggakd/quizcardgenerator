@@ -1626,6 +1626,19 @@ body.clean-screenshot-mode .main-workspace {
   border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
+/* Ensure inner category/topic tag text inside pill has NO inner border or background */
+.li-slide-tag .card-topic-tag,
+.li-slide-tag .tag-text,
+.hook-tag .card-topic-tag {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: inherit !important;
+}
+
 .scenario-tag {
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
@@ -1818,24 +1831,18 @@ body.clean-screenshot-mode .main-workspace {
 .li-hero-card {
   background: var(--reveal-bg, rgba(16, 185, 129, 0.12));
   border: 1.5px solid var(--reveal-border, rgba(16, 185, 129, 0.45));
+  border-left: 5px solid var(--reveal-accent, #10b981);
   border-radius: 12px;
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   position: relative;
-  overflow: hidden;
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
 }
 
 .li-hero-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--reveal-accent, #10b981);
+  display: none;
 }
 
 .li-hero-header {
@@ -2505,6 +2512,60 @@ body.clean-screenshot-mode .main-workspace {
 
 #exportRenderSandbox .li-slide-color-picker {
   display: none !important;
+}
+
+/* Eliminate html2canvas box-shadow clipping corner artifacts on rounded elements */
+#exportRenderSandbox .linkedin-slide,
+#exportRenderSandbox .linkedin-slide * {
+  box-shadow: none !important;
+}
+
+/* Scaled, crisp Option Badges (A-D) for 1080x1080 export */
+#exportRenderSandbox .linkedin-slide .option-badge {
+  padding: 10px 22px 10px 14px !important;
+  border-radius: 18px !important;
+  border-width: 2px !important;
+  gap: 12px !important;
+}
+
+#exportRenderSandbox .linkedin-slide .badge-letter {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 1.45rem !important;
+  border-radius: 10px !important;
+}
+
+#exportRenderSandbox .linkedin-slide .badge-label-text {
+  font-size: 1.15rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+#exportRenderSandbox .linkedin-slide .li-hero-card::before {
+  display: none !important;
+}
+
+#exportRenderSandbox .linkedin-slide .li-hero-card {
+  border-left: 6px solid var(--reveal-accent, #10b981) !important;
+}
+
+/* In-place editable swipe prompt styling */
+.li-swipe-text {
+  cursor: text;
+  outline: none;
+  border-radius: 4px;
+  padding: 1px 4px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.li-swipe-text:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.li-swipe-text:focus {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
 }
 
 /* ==========================================================================
