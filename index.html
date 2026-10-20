@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostSquare - Dark Theme Multi-Choice Card Creator</title>
+  <meta name="description" content="Generate aesthetic 1:1 square dark theme cards for multiple choice questions, social posts, and carousel slides.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas for 1-click high-resolution 1:1 PNG export (Offline local + CDN fallback) -->
+  <script src="html2canvas.min.js"></script>
+  <script>
+    if (typeof html2canvas === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- jsPDF for 1-click multi-page LinkedIn Document Carousel PDF export (Offline local + CDN fallback) -->
+  <script src="jspdf.umd.min.js"></script>
+  <script>
+    if (typeof window.jspdf === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+    }
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-obsidian">
+
+  <!-- Top App Navigation & Controls -->
+  <header class="app-header" id="appHeader">
+    <div class="brand">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">PostSquare Studio</h1>
+        <p class="brand-sub">Dark Theme 1:1 Social Content Cards</p>
+      </div>
+    </div>
+
+    <!-- Quick Mode / View Selectors -->
+    <div class="view-toggles">
+      <button class="toggle-btn active" id="viewGridBtn" title="2x2 Grid View (Twitter / Social 4 Blocks)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>4-Block Grid</span>
+      </button>
+
+      <button class="toggle-btn" id="viewLinkedInBtn" title="Interactive LinkedIn Document Carousel (PDF & Swipe Simulator)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>LinkedIn Carousel (PDF)</span>
+      </button>
+
+      <button class="toggle-btn" id="screenshotModeBtn" title="Clean Screenshot Mode (Hides UI controls, Press Esc to exit)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M15 9l-6 6"></path>
+          <path d="M9 9l6 6"></path>
+        </svg>
+        <span>Zen View</span>
+      </button>
+    </div>
+
+    <!-- Main Action Buttons -->
+    <div class="header-actions">
+      <button class="action-btn secondary" id="smartPasteTriggerBtn" title="Paste multiple lines of text to auto-populate cards">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <rect x="8" y="2" width="8" height="4" rx="1"></rect>
+        </svg>
+        <span>Quick Paste</span>
+      </button>
+
+      <button class="action-btn secondary" id="editorDrawerBtn" title="Open Edit Panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+        </svg>
+        <span>Settings</span>
+      </button>
+
+      <button class="action-btn secondary" id="exportAllBtn" title="Export all 4 blocks as PNGs">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Export 4 PNGs</span>
+      </button>
+
+      <button class="action-btn primary" id="exportPdfBtn" title="Export LinkedIn Document Carousel as multi-page PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <polyline points="9 15 12 18 15 15"></polyline>
+        </svg>
+        <span>Export LinkedIn PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Main Canvas Container -->
+  <main class="main-workspace" id="mainWorkspace">
+
+    <!-- Informative editing hint bar -->
+    <div class="quick-toolbar" id="quickToolbar">
+      <div class="hint-pill">
+        <span class="hint-dot"></span>
+        <span><strong>Live In-Place Edit:</strong> Click directly into any text on the cards below to edit. Press <strong>Esc</strong> for Clean Screenshot Mode.</span>
+      </div>
+
+      <div class="quick-controls">
+        <!-- Theme Selector -->
+        <label class="control-select-label" for="themePicker">Theme:
+          <select id="themePicker" class="custom-select">
+            <option value="theme-obsidian">Obsidian Neon (Default)</option>
+            <option value="theme-midnight">Midnight Azure</option>
+            <option value="theme-cyber">Cyberpunk Violet</option>
+            <option value="theme-emerald">Deep Emerald</option>
+            <option value="theme-carbon">Carbon Minimal</option>
+            <option value="theme-ember">Dark Ember Glow</option>
+          </select>
+        </label>
+
+        <!-- Font Size Scale -->
+        <label class="control-select-label" for="fontSizeSelect">Text Size:
+          <select id="fontSizeSelect" class="custom-select">
+            <option value="font-compact">Compact (For very lengthy text)</option>
+            <option value="font-medium" selected>Balanced (Recommended)</option>
+            <option value="font-large">Large & Punchy</option>
+          </select>
+        </label>
+
+        <!-- PNG Corner / Border Style (Transparent vs Full Square) -->
+        <label class="control-select-label" for="cornerStyleSelect" title="Control corner shape and transparency for downloaded PNGs">Block Corners:
+          <select id="cornerStyleSelect" class="custom-select">
+            <option value="square" selected>Full Square 1:1 (No White, Full Bleed)</option>
+            <option value="rounded-transparent">Rounded (100% Transparent Corners)</option>
+            <option value="rounded-dark">Rounded (Dark Matching Background)</option>
+          </select>
+        </label>
+
+        <!-- Square Export Resolution (including 280x280 Twitter Grid) -->
+        <label class="control-select-label" for="exportSizeSelect" title="Square image export size">Export Size:
+          <select id="exportSizeSelect" class="custom-select">
+            <option value="280">280 × 280 (Twitter Grid)</option>
+            <option value="560">560 × 560 (Twitter 2x Retina)</option>
+            <option value="1080" selected>1080 × 1080 (HD Feed)</option>
+            <option value="1200">1200 × 1200 (Ultra HD)</option>
+          </select>
+        </label>
+
+        <!-- Card X/N Slide Counter Toggle Button -->
+        <button class="pill-btn counter-pill" id="quickToggleCounterBtn" title="Toggle 'Card X/4' slide counter on all cards">
+          <span class="counter-status-dot"></span>
+          <span id="counterBtnText">Card X/4: OFF</span>
+        </button>
+
+        <!-- Correct Answer Marker Toggle -->
+        <div class="badge-toggle-group" title="Mark which option is the correct answer (optional)">
+          <span class="badge-label">Highlight Answer:</span>
+          <button class="pill-btn answer-pill" data-ans="none" id="ansNone">None</button>
+          <button class="pill-btn answer-pill" data-ans="A">A</button>
+          <button class="pill-btn answer-pill" data-ans="B">B</button>
+          <button class="pill-btn answer-pill" data-ans="C">C</button>
+          <button class="pill-btn answer-pill" data-ans="D">D</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Cards Grid Container (Perfect 1:1 Aspect Ratio) -->
+    <div class="cards-grid layout-grid font-medium" id="cardsContainer">
+      
+      <!-- CARD A UNIT -->
+      <div class="card-unit" id="unit-A">
+        <div class="square-card" id="card-A" data-option="A">
+          <div class="card-inner">
+            <div class="card-glow"></div>
+            
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="option-badge badge-a">
+                <span class="badge-letter">A</span>
+                <span class="badge-label-text">OPTION</span>
+              </div>
+              <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                DATA ARCHITECTURE
+              </div>
+            </div>
+
+            <!-- Card Question (Optional context line) -->
+            <div class="card-question-wrap">
+              <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                Which statement accurately describes the layers?
+              </h2>
+            </div>
+
+            <!-- Decorative Divider Line -->
+            <div class="card-divider">
+              <span class="divider-accent"></span>
+            </div>
+
+            <!-- Main Option Content (Varying Lengthy Line) -->
+            <div class="card-body">
+              <div class="option-quote-icon">“</div>
+              <div class="card-text-content" contenteditable="true" spellcheck="false" id="text-A" data-field="optionA">
+                The Landing layer stores raw data; the Gold layer stores cleansed events directly.
+              </div>
+            </div>
+
+            <!-- Card Footer (Watermark, Handle, Post sequence) -->
+            <div class="card-footer">
+              <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+              </div>
+              <div class="post-slide-counter">
+                <span>Card 1 / 4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Visible Action Bar Under Card A -->
+        <div class="card-toolbar">
+          <button class="save-image-btn" onclick="downloadCardImage('card-A', 'Option_A')" title="Download 1:1 square PNG (1080x1080)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Save 1:1 Image</span>
+          </button>
+          <button class="copy-image-btn" onclick="copyCardAsImage('card-A')" title="Copy 1:1 Image to Clipboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD B UNIT -->
+      <div class="card-unit" id="unit-B">
+        <div class="square-card" id="card-B" data-option="B">
+          <div class="card-inner">
+            <div class="card-glow"></div>
+
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="option-badge badge-b">
+                <span class="badge-letter">B</span>
+                <span class="badge-label-text">OPTION</span>
+              </div>
+              <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                DATA ARCHITECTURE
+              </div>
+            </div>
+
+            <!-- Card Question -->
+            <div class="card-question-wrap">
+              <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                Which statement accurately describes the layers?
+              </h2>
+            </div>
+
+            <!-- Decorative Divider Line -->
+            <div class="card-divider">
+              <span class="divider-accent"></span>
+            </div>
+
+            <!-- Main Option Content -->
+            <div class="card-body">
+              <div class="option-quote-icon">“</div>
+              <div class="card-text-content" contenteditable="true" spellcheck="false" id="text-B" data-field="optionB">
+                The Bronze layer stores the raw unaltered data; the Silver layer stores cleansed and enriched events.
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+              </div>
+              <div class="post-slide-counter">
+                <span>Card 2 / 4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Visible Action Bar Under Card B -->
+        <div class="card-toolbar">
+          <button class="save-image-btn" onclick="downloadCardImage('card-B', 'Option_B')" title="Download 1:1 square PNG (1080x1080)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Save 1:1 Image</span>
+          </button>
+          <button class="copy-image-btn" onclick="copyCardAsImage('card-B')" title="Copy 1:1 Image to Clipboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD C UNIT -->
+      <div class="card-unit" id="unit-C">
+        <div class="square-card" id="card-C" data-option="C">
+          <div class="card-inner">
+            <div class="card-glow"></div>
+
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="option-badge badge-c">
+                <span class="badge-letter">C</span>
+                <span class="badge-label-text">OPTION</span>
+              </div>
+              <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                DATA ARCHITECTURE
+              </div>
+            </div>
+
+            <!-- Card Question -->
+            <div class="card-question-wrap">
+              <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                Which statement accurately describes the layers?
+              </h2>
+            </div>
+
+            <!-- Decorative Divider Line -->
+            <div class="card-divider">
+              <span class="divider-accent"></span>
+            </div>
+
+            <!-- Main Option Content -->
+            <div class="card-body">
+              <div class="option-quote-icon">“</div>
+              <div class="card-text-content" contenteditable="true" spellcheck="false" id="text-C" data-field="optionC">
+                The Bronze layer stores cleansed events; the Silver layer stores aggregated business data marts.
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+              </div>
+              <div class="post-slide-counter">
+                <span>Card 3 / 4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Visible Action Bar Under Card C -->
+        <div class="card-toolbar">
+          <button class="save-image-btn" onclick="downloadCardImage('card-C', 'Option_C')" title="Download 1:1 square PNG (1080x1080)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Save 1:1 Image</span>
+          </button>
+          <button class="copy-image-btn" onclick="copyCardAsImage('card-C')" title="Copy 1:1 Image to Clipboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD D UNIT -->
+      <div class="card-unit" id="unit-D">
+        <div class="square-card" id="card-D" data-option="D">
+          <div class="card-inner">
+            <div class="card-glow"></div>
+
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="option-badge badge-d">
+                <span class="badge-letter">D</span>
+                <span class="badge-label-text">OPTION</span>
+              </div>
+              <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                DATA ARCHITECTURE
+              </div>
+            </div>
+
+            <!-- Card Question -->
+            <div class="card-question-wrap">
+              <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                Which statement accurately describes the layers?
+              </h2>
+            </div>
+
+            <!-- Decorative Divider Line -->
+            <div class="card-divider">
+              <span class="divider-accent"></span>
+            </div>
+
+            <!-- Main Option Content -->
+            <div class="card-body">
+              <div class="option-quote-icon">“</div>
+              <div class="card-text-content" contenteditable="true" spellcheck="false" id="text-D" data-field="optionD">
+                The Silver layer stores raw unaltered data; the Gold layer stores cleansed events alongside aggregates.
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+              </div>
+              <div class="post-slide-counter">
+                <span>Card 4 / 4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dedicated Visible Action Bar Under Card D -->
+        <div class="card-toolbar">
+          <button class="save-image-btn" onclick="downloadCardImage('card-D', 'Option_D')" title="Download 1:1 square PNG (1080x1080)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Save 1:1 Image</span>
+          </button>
+          <button class="copy-image-btn" onclick="copyCardAsImage('card-D')" title="Copy 1:1 Image to Clipboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Single View Navigation (when in Single Card mode) -->
+    <div class="single-nav-bar hidden" id="singleNavBar">
+      <button class="nav-arrow-btn" id="prevCardBtn" title="Previous Card (Left Arrow)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Prev</span>
+      </button>
+
+      <div class="nav-indicators" id="navDots">
+        <button class="nav-dot active" data-index="0">A</button>
+        <button class="nav-dot" data-index="1">B</button>
+        <button class="nav-dot" data-index="2">C</button>
+        <button class="nav-dot" data-index="3">D</button>
+      </div>
+
+      <button class="nav-arrow-btn" id="nextCardBtn" title="Next Card (Right Arrow)">
+        <span>Next</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dedicated LinkedIn Carousel Studio & Post Simulator -->
+    <div class="linkedin-studio-container hidden" id="linkedinWorkspace">
+      
+      <!-- LinkedIn Post Simulator Card -->
+      <div class="linkedin-simulator-card">
+        
+        <!-- Authentic LinkedIn Header -->
+        <div class="linkedin-post-header">
+          <div class="li-author-row">
+            <div class="li-avatar" id="liAvatar">DE</div>
+            <div class="li-author-meta">
+              <div class="li-name-line">
+                <span class="li-author-name" contenteditable="true" spellcheck="false" id="liAuthorName">Data Architecture Lead</span>
+                <span class="li-connection-degree">• 1st</span>
+              </div>
+              <div class="li-headline-line" contenteditable="true" spellcheck="false" id="liAuthorHeadline">
+                Staff Data Engineer @ Cloud Lakehouse | 12,450 followers
+              </div>
+              <div class="li-time-line">
+                <span>1d • Edited • </span>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 0a8 8 0 1 0 8 8 8.01 8.01 0 0 0-8-8zm0 14.5a6.5 6.5 0 0 1-5.18-10.45l2.42 2.42a4 4 0 0 0 5.52 5.52l2.42 2.42A6.47 6.47 0 0 1 8 14.5zm5.72-2.31l-2.07-2.07a4 4 0 0 0-5.58-5.58L3.99 2.46A6.5 6.5 0 0 1 13.72 12.19z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Tag Badge in LinkedIn header -->
+          <div class="li-doc-badge">
+            <span class="li-doc-filename" id="liDocFilename">medallion_architecture_quiz.pdf</span>
+            <span class="li-doc-pages" id="liDocPageCount">8 pages</span>
+          </div>
+        </div>
+
+        <!-- Post Caption Body -->
+        <div class="li-post-caption" contenteditable="true" spellcheck="false" id="liPostCaption">
+          How well do you know the Databricks Medallion Architecture? 💡 Swipe through this quiz carousel to test your lakehouse knowledge. Drop your answer in the comments before slide 8! 👇
+        </div>
+
+        <!-- LinkedIn Carousel Viewport Frame -->
+        <div class="linkedin-carousel-frame">
+          
+          <!-- Floating Prev / Next Arrow Chevrons -->
+          <button class="li-nav-chevron prev" id="liPrevSlideBtn" title="Previous Slide (Left Arrow)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <button class="li-nav-chevron next" id="liNextSlideBtn" title="Next Slide (Right Arrow)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- Active Slides Container -->
+          <div class="linkedin-slides-viewport" id="liSlidesViewport">
+
+            <!-- SLIDE 1: HOOK / COVER -->
+            <div class="linkedin-slide square-card active-slide" id="li-slide-1" data-slide-index="0">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+                
+                <div class="card-header">
+                  <div class="li-slide-tag hook-tag">
+                    <span class="tag-icon">⚡</span>
+                    <span class="card-topic-tag tag-text" contenteditable="true" spellcheck="false" data-field="topic" id="liHookTag">DATA ARCHITECTURE</span>
+                  </div>
+                </div>
+
+                <div class="slide-main-content hook-body">
+                  <h2 class="li-hook-title" contenteditable="true" spellcheck="false" id="liHookTitle">
+                    How well do you know the Databricks Medallion Architecture?
+                  </h2>
+                  <p class="li-hook-sub" contenteditable="true" spellcheck="false" id="liHookSub">
+                    Test your lakehouse data modeling skills across Bronze, Silver, & Gold layers.
+                  </p>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe to start 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 2: SCENARIO / FULL QUESTION -->
+            <div class="linkedin-slide square-card" id="li-slide-2" data-slide-index="1">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="li-slide-tag scenario-tag">
+                    <span class="tag-icon">📌</span>
+                    <span class="tag-text" contenteditable="true" spellcheck="false" id="liSlide2Tag">THE QUESTION / SCENARIO</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="slide-main-content scenario-body">
+                  <h3 class="li-scenario-title" contenteditable="true" spellcheck="false" id="liScenarioTitle">
+                    Understanding Medallion Layers
+                  </h3>
+                  <div class="li-scenario-text" contenteditable="true" spellcheck="false" id="liScenarioText">
+                    Which statement accurately describes the data responsibilities and transformations between the Bronze, Silver, and Gold layers?
+                  </div>
+                  <div class="li-hint-box" contenteditable="true" spellcheck="false" id="liScenarioHint">
+                    💡 <strong>Pro-Tip:</strong> Think about raw ingestion integrity, cleansed enrichment, and aggregated analytical business marts.
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for Option A 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 3: OPTION A -->
+            <div class="linkedin-slide square-card" id="li-slide-3" data-slide-index="2">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="option-badge badge-a">
+                    <span class="badge-letter">A</span>
+                    <span class="badge-label-text">OPTION</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="card-question-wrap">
+                  <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                    Which statement accurately describes the layers?
+                  </h2>
+                </div>
+
+                <div class="card-divider"><span class="divider-accent"></span></div>
+
+                <div class="card-body">
+                  <div class="option-quote-icon">“</div>
+                  <div class="card-text-content" contenteditable="true" spellcheck="false" id="li-text-A" data-field="optionA">
+                    The Landing layer stores raw data; the Gold layer stores cleansed events directly.
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for Option B 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 4: OPTION B -->
+            <div class="linkedin-slide square-card" id="li-slide-4" data-slide-index="3">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="option-badge badge-b">
+                    <span class="badge-letter">B</span>
+                    <span class="badge-label-text">OPTION</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="card-question-wrap">
+                  <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                    Which statement accurately describes the layers?
+                  </h2>
+                </div>
+
+                <div class="card-divider"><span class="divider-accent"></span></div>
+
+                <div class="card-body">
+                  <div class="option-quote-icon">“</div>
+                  <div class="card-text-content" contenteditable="true" spellcheck="false" id="li-text-B" data-field="optionB">
+                    The Bronze layer stores the raw unaltered data; the Silver layer stores cleansed and enriched events.
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for Option C 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 5: OPTION C -->
+            <div class="linkedin-slide square-card" id="li-slide-5" data-slide-index="4">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="option-badge badge-c">
+                    <span class="badge-letter">C</span>
+                    <span class="badge-label-text">OPTION</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="card-question-wrap">
+                  <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                    Which statement accurately describes the layers?
+                  </h2>
+                </div>
+
+                <div class="card-divider"><span class="divider-accent"></span></div>
+
+                <div class="card-body">
+                  <div class="option-quote-icon">“</div>
+                  <div class="card-text-content" contenteditable="true" spellcheck="false" id="li-text-C" data-field="optionC">
+                    The Bronze layer stores cleansed events; the Silver layer stores aggregated business data marts.
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for Option D 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 6: OPTION D -->
+            <div class="linkedin-slide square-card" id="li-slide-6" data-slide-index="5">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="option-badge badge-d">
+                    <span class="badge-letter">D</span>
+                    <span class="badge-label-text">OPTION</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="card-question-wrap">
+                  <h2 class="card-question-text" contenteditable="true" spellcheck="false" data-field="question">
+                    Which statement accurately describes the layers?
+                  </h2>
+                </div>
+
+                <div class="card-divider"><span class="divider-accent"></span></div>
+
+                <div class="card-body">
+                  <div class="option-quote-icon">“</div>
+                  <div class="card-text-content" contenteditable="true" spellcheck="false" id="li-text-D" data-field="optionD">
+                    The Silver layer stores raw unaltered data; the Gold layer stores cleansed events alongside aggregates.
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for Answer Check 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 7: ENGAGEMENT / COMMENT PROMPT -->
+            <div class="linkedin-slide square-card" id="li-slide-7" data-slide-index="6">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="li-slide-tag engagement-tag">
+                    <span class="tag-icon">💬</span>
+                    <span class="tag-text" contenteditable="true" spellcheck="false" id="liSlide7Tag">PAUSE & REFLECT</span>
+                  </div>
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="slide-main-content engagement-body">
+                  <h2 class="li-engagement-title" contenteditable="true" spellcheck="false" id="liEngagementTitle">
+                    Ready for the answer?
+                  </h2>
+                  <div class="li-engagement-card">
+                    <div class="li-engagement-callout" contenteditable="true" spellcheck="false" id="liEngagementText">
+                      Drop your choice (A, B, C, or D) in the comments below before you swipe to the reveal!
+                    </div>
+                    <div class="li-engagement-sub" contenteditable="true" spellcheck="false" id="liEngagementSub">
+                      Can you explain why the other 3 choices fail?
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="li-swipe-prompt">
+                    <span>Swipe for the Reveal 👉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SLIDE 8: ANSWER REVEAL & EXPLANATION -->
+            <div class="linkedin-slide square-card" id="li-slide-8" data-slide-index="7">
+              <div class="card-inner">
+                <div class="card-glow"></div>
+
+                <div class="card-header">
+                  <div class="li-slide-tag reveal-tag">
+                    <span class="tag-icon">🎯</span>
+                    <span class="tag-text" contenteditable="true" spellcheck="false" id="liSlide8Tag">ANSWER REVEAL & BREAKDOWN</span>
+                  </div>
+
+                  <!-- Quick Color Customizer on Slide 8 -->
+                  <div class="li-slide-color-picker" id="liSlideColorPicker" title="Custom Block Color">
+                    <button class="color-dot active" data-color="#10b981" style="background:#10b981;" title="Emerald Green"></button>
+                    <button class="color-dot" data-color="#06b6d4" style="background:#06b6d4;" title="Electric Cyan"></button>
+                    <button class="color-dot" data-color="#a855f7" style="background:#a855f7;" title="Royal Violet"></button>
+                    <button class="color-dot" data-color="#f59e0b" style="background:#f59e0b;" title="Golden Amber"></button>
+                    <button class="color-dot" data-color="#f43f5e" style="background:#f43f5e;" title="Rose Crimson"></button>
+                    <label class="color-dot-custom" title="Pick Any Custom Color">
+                      <input type="color" id="quickRevealColorInput" value="#10b981">
+                      <span>🎨</span>
+                    </label>
+                  </div>
+
+                  <div class="card-topic-tag" contenteditable="true" spellcheck="false" data-field="topic">
+                    DATA ARCHITECTURE
+                  </div>
+                </div>
+
+                <div class="slide-main-content reveal-body">
+                  <!-- Block 1: The Correct Answer Hero Block -->
+                  <div class="li-hero-card" id="liCorrectHeroBlock">
+                    <div class="li-hero-header">
+                      <div class="li-reveal-pill" id="liRevealPill">
+                        <span class="check-icon">✓</span>
+                        <span id="liRevealAnswerText" contenteditable="true" spellcheck="false">CORRECT ANSWER: OPTION B</span>
+                      </div>
+                    </div>
+                    <div class="li-hero-option-text" contenteditable="true" spellcheck="false" id="liCorrectOptionText">
+                      The Bronze layer stores the raw unaltered data; the Silver layer stores cleansed and enriched events.
+                    </div>
+                    <div class="li-hero-explanation" contenteditable="true" spellcheck="false" id="liCorrectExpText">
+                      💡 That's right! The Bronze layer retains raw historical data in its original form regardless of quality errors, whereas the Silver layer handles data cleansing, filtering, and contextual enrichment.
+                    </div>
+                  </div>
+
+                  <!-- Block 2: Why The Other 3 Choices Fail (Traps Breakdown) -->
+                  <div class="li-traps-card" id="liTrapsBlock">
+                    <div class="li-traps-header">
+                      <span class="traps-icon">⚠️</span>
+                      <span class="traps-title-text" contenteditable="true" spellcheck="false" id="liTrapsTitle">WHY THE OTHER 3 CHOICES FAIL:</span>
+                    </div>
+                    <div class="li-traps-list" id="liTrapsList">
+                      <div class="trap-item" data-opt="A">
+                        <span class="trap-badge opt-a">A ✗</span>
+                        <span class="trap-text" contenteditable="true" spellcheck="false" id="liTrapExpA">The Gold layer is reserved for business-level aggregates and star-schema models rather than intermediate cleansed and conformed datasets.</span>
+                      </div>
+                      <div class="trap-item" data-opt="C">
+                        <span class="trap-badge opt-c">C ✗</span>
+                        <span class="trap-text" contenteditable="true" spellcheck="false" id="liTrapExpC">The Bronze layer does not clean or transform incoming records, as doing so would erase the original source audit trail.</span>
+                      </div>
+                      <div class="trap-item" data-opt="D">
+                        <span class="trap-badge opt-d">D ✗</span>
+                        <span class="trap-text" contenteditable="true" spellcheck="false" id="liTrapExpD">Storing raw, unvalidated data directly in the Silver layer violates the Medallion progression, which relies on Bronze to isolate original source payloads.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Legacy / 3-Point Bullets support (hidden by default unless user switches layout) -->
+                  <div class="li-explanation-list hidden" id="liExplanationList">
+                    <div class="li-exp-item">
+                      <span class="exp-bullet bronze" contenteditable="true" spellcheck="false" id="liBullet1">Bronze</span>
+                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp1">Raw, unaltered source data appended with full fidelity history.</span>
+                    </div>
+                    <div class="li-exp-item">
+                      <span class="exp-bullet silver" contenteditable="true" spellcheck="false" id="liBullet2">Silver</span>
+                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp2">Cleansed, validated, deduplicated, and enriched table schemas.</span>
+                    </div>
+                    <div class="li-exp-item">
+                      <span class="exp-bullet gold" contenteditable="true" spellcheck="false" id="liBullet3">Gold</span>
+                      <span class="exp-text" contenteditable="true" spellcheck="false" id="liExp3">Aggregated business data marts and star schemas ready for BI/ML.</span>
+                    </div>
+                  </div>
+
+                  <div class="li-post-cta" contenteditable="true" spellcheck="false" id="liPostCta">
+                    🔖 Save this post for your next data architecture interview & Follow for more!
+                  </div>
+                </div>
+
+                <div class="card-footer li-slide-footer">
+                  <div class="author-watermark" contenteditable="true" spellcheck="false" data-field="author">
+                    <span class="author-symbol">@</span><span class="author-name">dataengineering</span>
+                  </div>
+                  <div class="post-slide-counter">
+                    <span>End of Carousel 🎉</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom LinkedIn Document Controls & Progress Bar -->
+          <div class="linkedin-doc-footer">
+            <div class="li-progress-track">
+              <div class="li-progress-fill" id="liProgressFill" style="width: 12.5%;"></div>
+            </div>
+
+            <div class="li-footer-info">
+              <span class="li-page-counter" id="liPageCounter">1 / 8</span>
+              <div class="li-nav-mini-dots" id="liMiniDots"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Dedicated LinkedIn Carousel Action Toolbar -->
+        <div class="linkedin-action-bar">
+          <button class="li-btn primary" id="liExportPdfActionBtn" title="Download 1:1 Square 8-Page LinkedIn Document PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <polyline points="9 15 12 18 15 15"></polyline>
+            </svg>
+            <span>Download LinkedIn PDF</span>
+          </button>
+
+          <button class="li-btn secondary" id="liSaveSlidePngBtn" title="Download current active slide as 1:1 square PNG">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Save Active Slide PNG</span>
+          </button>
+
+          <button class="li-btn secondary" id="liSaveAllPngBtn" title="Download all 8 slides as individual 1:1 square PNG images">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            <span>Save All 8 PNGs</span>
+          </button>
+
+          <button class="li-btn secondary" id="liToggleViewModeBtn" title="Toggle between Carousel Player and Grid View of all 8 slides">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+            </svg>
+            <span id="liViewModeText">View All 8 (Grid)</span>
+          </button>
+
+          <!-- Explicit Resolution Selector in LinkedIn Toolbar -->
+          <div class="li-size-picker-wrap" title="Square 1:1 Resolution for PNG exports and slide renders">
+            <span class="li-size-badge">1:1 Square:</span>
+            <select id="liExportSizeSelect" class="custom-select li-size-select">
+              <option value="1080" selected>1080 × 1080 (HD Feed)</option>
+              <option value="1200">1200 × 1200 (Ultra HD)</option>
+              <option value="560">560 × 560 (Retina)</option>
+              <option value="280">280 × 280 (Twitter Grid)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Thumbnails Strip for Jump-to-Slide -->
+        <div class="li-thumbnail-strip" id="liThumbnailStrip">
+          <!-- Rendered dynamically -->
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Hidden High-Fidelity 1:1 Square Sandbox for Zero-Distortion PDF & PNG Rendering -->
+    <div id="exportRenderSandbox" style="position:fixed; top:-99999px; left:-99999px; width:1080px; height:1080px; overflow:hidden; z-index:-99999; pointer-events:none; background:#07090e;"></div>
+
+  </main>
+
+  <!-- Clean Mode Overlay Exit Notice -->
+  <div class="zen-exit-banner hidden" id="zenExitBanner">
+    <span>✨ Clean Screenshot Mode Active</span>
+    <span class="zen-hint">Take your screenshots now! Press <strong>Esc</strong> or click here to restore toolbar</span>
+    <button class="zen-close-btn" id="zenExitBtn">Exit</button>
+  </div>
+
+  <!-- Smart Paste Modal -->
+  <div class="modal-overlay hidden" id="smartPasteModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>⚡ Quick Paste / Bulk Import</h3>
+          <p>Paste any formatted question with A, B, C, D options to automatically update all 4 cards</p>
+        </div>
+        <button class="modal-close-btn" id="closePasteModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="bulkPasteInput" class="modal-label">Raw Text (Question + Options + Explanations):</label>
+        <textarea id="bulkPasteInput" class="paste-textarea" rows="12" placeholder="A streaming ingestion pipeline receives web clickstream events containing occasional malformed JSON payloads. According to Medallion architecture principles, which layer should store this raw, unaltered dataset complete with its data quality flaws, and which subsequent layer is tasked with storing cleansed and enriched events?
+
+A.
+The Landing layer stores raw data; the Gold layer stores cleansed events directly.
+The Gold layer is reserved for business-level aggregates and star-schema models rather than intermediate cleansed and conformed datasets.
+
+B.
+The Bronze layer stores the raw unaltered data; the Silver layer stores cleansed and enriched events.
+That's right!
+The Bronze layer retains raw historical data in its original form regardless of quality errors, whereas the Silver layer handles data cleansing, filtering, and contextual enrichment.
+
+C.
+The Bronze layer stores cleansed events; the Silver layer stores aggregated business data marts.
+The Bronze layer does not clean or transform incoming records, as doing so would erase the original source audit trail.
+
+D.
+The Silver layer stores raw unaltered data; the Gold layer stores cleansed events alongside aggregates.
+Storing raw, unvalidated data directly in the Silver layer violates the Medallion progression, which relies on Bronze to isolate original source payloads."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn secondary" id="loadSampleBtn">Load Example</button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary" id="cancelPasteModalBtn">Cancel</button>
+          <button class="action-btn primary" id="applyPasteBtn">Apply to 4 Blocks</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Settings & Form Drawer -->
+  <aside class="side-drawer hidden" id="settingsDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <h3>Studio Customizer</h3>
+        <p>Fine-tune text, aesthetics & branding</p>
+      </div>
+      <button class="drawer-close-btn" id="closeDrawerBtn">&times;</button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Section: Global Content -->
+      <div class="drawer-section">
+        <h4 class="drawer-sec-title">Global Card Details</h4>
+        
+        <div class="form-group">
+          <label for="globalTopicInput">Category / Topic Tag:</label>
+          <input type="text" id="globalTopicInput" class="form-input" value="DATA ARCHITECTURE" placeholder="e.g. SYSTEM DESIGN, SQL, PYTHON">
+        </div>
+
+        <div class="form-group">
+          <label for="globalQuestionInput">Shared Question Line:</label>
+          <textarea id="globalQuestionInput" class="form-textarea" rows="2" placeholder="Which statement accurately describes the layers?">Which statement accurately describes the layers?</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="globalAuthorInput">Author / Handle Tag:</label>
+          <input type="text" id="globalAuthorInput" class="form-input" value="dataengineering" placeholder="e.g. yourhandle or name">
+        </div>
+      </div>
+
+      <!-- Section: Options Text -->
+      <div class="drawer-section">
+        <h4 class="drawer-sec-title">Options Content</h4>
+
+        <div class="form-group option-form-group">
+          <label for="formOptA"><span class="badge-mini a">A</span> Option A Text:</label>
+          <textarea id="formOptA" class="form-textarea opt-field" rows="2"></textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="formOptB"><span class="badge-mini b">B</span> Option B Text:</label>
+          <textarea id="formOptB" class="form-textarea opt-field" rows="2"></textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="formOptC"><span class="badge-mini c">C</span> Option C Text:</label>
+          <textarea id="formOptC" class="form-textarea opt-field" rows="2"></textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="formOptD"><span class="badge-mini d">D</span> Option D Text:</label>
+          <textarea id="formOptD" class="form-textarea opt-field" rows="2"></textarea>
+        </div>
+      </div>
+
+      <!-- Section: LinkedIn Carousel Content -->
+      <div class="drawer-section">
+        <h4 class="drawer-sec-title">LinkedIn Carousel Content</h4>
+
+        <!-- Slide 1 -->
+        <div class="form-group">
+          <label for="drawerLiHookTitle">Slide 1: Hook Title:</label>
+          <input type="text" id="drawerLiHookTitle" class="form-input" value="How well do you know the Databricks Medallion Architecture?">
+        </div>
+
+        <div class="form-group">
+          <label for="drawerLiHookSub">Slide 1: Hook Subtitle:</label>
+          <input type="text" id="drawerLiHookSub" class="form-input" value="Test your lakehouse data modeling skills across Bronze, Silver, & Gold layers.">
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="form-group">
+          <label for="drawerLiScenarioTitle">Slide 2: Scenario Title:</label>
+          <input type="text" id="drawerLiScenarioTitle" class="form-input" value="Understanding Medallion Layers">
+        </div>
+
+        <div class="form-group">
+          <label for="drawerLiScenarioText">Slide 2: Scenario / Question Text:</label>
+          <textarea id="drawerLiScenarioText" class="form-textarea" rows="2">Which statement accurately describes the data responsibilities and transformations between the Bronze, Silver, and Gold layers?</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="drawerLiScenarioHint">Slide 2: Scenario Hint Box:</label>
+          <input type="text" id="drawerLiScenarioHint" class="form-input" value="💡 Pro-Tip: Think about raw ingestion integrity, cleansed enrichment, and aggregated analytical business marts.">
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="form-group">
+          <label for="drawerLiEngagementTitle">Slide 7: Engagement Title:</label>
+          <input type="text" id="drawerLiEngagementTitle" class="form-input" value="Ready for the answer?">
+        </div>
+
+        <div class="form-group">
+          <label for="drawerLiEngagementText">Slide 7: Engagement Prompt:</label>
+          <input type="text" id="drawerLiEngagementText" class="form-input" value="Drop your choice (A, B, C, or D) in the comments below before you swipe to the reveal!">
+        </div>
+
+        <div class="form-group">
+          <label for="drawerLiEngagementSub">Slide 7: Engagement Subtitle:</label>
+          <input type="text" id="drawerLiEngagementSub" class="form-input" value="Can you explain why the other 3 choices fail?">
+        </div>
+
+        <!-- Slide 8 Customization -->
+        <div class="form-group">
+          <label for="drawerLiRevealAns">Slide 8: Correct Winning Answer:</label>
+          <select id="drawerLiRevealAns" class="custom-select">
+            <option value="A">Option A</option>
+            <option value="B" selected>Option B</option>
+            <option value="C">Option C</option>
+            <option value="D">Option D</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Slide 8: Reveal Block Accent Color:</label>
+          <div class="color-palette-row">
+            <button type="button" class="swatch-btn active" data-color="#10b981" style="background:#10b981;" title="Emerald Green"></button>
+            <button type="button" class="swatch-btn" data-color="#06b6d4" style="background:#06b6d4;" title="Electric Cyan"></button>
+            <button type="button" class="swatch-btn" data-color="#a855f7" style="background:#a855f7;" title="Royal Violet"></button>
+            <button type="button" class="swatch-btn" data-color="#f59e0b" style="background:#f59e0b;" title="Golden Amber"></button>
+            <button type="button" class="swatch-btn" data-color="#f43f5e" style="background:#f43f5e;" title="Rose Crimson"></button>
+            <div class="custom-color-wrap">
+              <input type="color" id="drawerLiRevealColor" class="custom-color-input" value="#10b981" title="Custom Hex Color">
+              <span class="custom-color-label">Custom</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Slide 8: Explanation Layout Format:</label>
+          <div class="pill-group" id="drawerRevealLayoutGroup">
+            <button type="button" class="pill-btn active layout-btn" data-layout="split">2-Block Split (Hero + 3 Traps)</button>
+            <button type="button" class="pill-btn layout-btn" data-layout="all4">All 4 Breakdown</button>
+            <button type="button" class="pill-btn layout-btn" data-layout="bullets">3 Key Points</button>
+          </div>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="drawerExpA"><span class="badge-mini a">A</span> Option A Explanation (Why it's wrong):</label>
+          <textarea id="drawerExpA" class="form-textarea opt-field" rows="2">The Gold layer is reserved for business-level aggregates and star-schema models rather than intermediate cleansed and conformed datasets.</textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="drawerExpB"><span class="badge-mini b">B</span> Option B Explanation (Why it's correct):</label>
+          <textarea id="drawerExpB" class="form-textarea opt-field" rows="2">That's right! The Bronze layer retains raw historical data in its original form regardless of quality errors, whereas the Silver layer handles data cleansing, filtering, and contextual enrichment.</textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="drawerExpC"><span class="badge-mini c">C</span> Option C Explanation (Why it's wrong):</label>
+          <textarea id="drawerExpC" class="form-textarea opt-field" rows="2">The Bronze layer does not clean or transform incoming records, as doing so would erase the original source audit trail.</textarea>
+        </div>
+
+        <div class="form-group option-form-group">
+          <label for="drawerExpD"><span class="badge-mini d">D</span> Option D Explanation (Why it's wrong):</label>
+          <textarea id="drawerExpD" class="form-textarea opt-field" rows="2">Storing raw, unvalidated data directly in the Silver layer violates the Medallion progression, which relies on Bronze to isolate original source payloads.</textarea>
+        </div>
+
+        <!-- Legacy Bullets (Optional fallback) -->
+        <details class="drawer-accordion">
+          <summary>Legacy 3-Point Bullets (Optional)</summary>
+          <div class="form-group" style="margin-top:8px;">
+            <label>Point 1 (Tag & Text):</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="drawerLiBullet1" class="form-input" style="width:90px; flex-shrink:0;" value="Bronze">
+              <input type="text" id="drawerLiExp1" class="form-input" style="flex:1;" value="Raw, unaltered source data appended with full fidelity history.">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Point 2 (Tag & Text):</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="drawerLiBullet2" class="form-input" style="width:90px; flex-shrink:0;" value="Silver">
+              <input type="text" id="drawerLiExp2" class="form-input" style="flex:1;" value="Cleansed, validated, deduplicated, and enriched table schemas.">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Point 3 (Tag & Text):</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="drawerLiBullet3" class="form-input" style="width:90px; flex-shrink:0;" value="Gold">
+              <input type="text" id="drawerLiExp3" class="form-input" style="flex:1;" value="Aggregated business data marts and star schemas ready for BI/ML.">
+            </div>
+          </div>
+        </details>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label for="drawerLiPostCta">Slide 8: Closing CTA Box:</label>
+          <input type="text" id="drawerLiPostCta" class="form-input" value="🔖 Save this post for your next data architecture interview & Follow for more!">
+        </div>
+      </div>
+
+      <!-- Section: Appearance Settings -->
+      <div class="drawer-section">
+        <h4 class="drawer-sec-title">Visual Styling</h4>
+        
+        <div class="form-group">
+          <label>Aspect Ratio / Frame Size:</label>
+          <div class="pill-group">
+            <button class="pill-btn active ratio-btn" data-ratio="square">1:1 Square (Feed)</button>
+            <button class="pill-btn ratio-btn" data-ratio="portrait">4:5 Portrait</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Decorative Elements:</label>
+          <div class="checkbox-row">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggleQuoteMarks" checked>
+              <span>Show Quote Mark Accent</span>
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggleGlowEffect" checked>
+              <span>Atmospheric Glow Effect</span>
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggleSlideCounter">
+              <span>Card Index ("Card 1/4")</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Presets & Reset -->
+      <div class="drawer-section">
+        <h4 class="drawer-sec-title">Presets & Storage</h4>
+        <div class="drawer-buttons-row">
+          <button class="action-btn secondary full-width" id="resetDefaultBtn">Reset to Sample</button>
+          <button class="action-btn secondary full-width" id="clearAllBtn">Clear All Text</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Core Javascript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
