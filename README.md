@@ -75,17 +75,48 @@ Or open `index.html` directly in your browser (all libraries are bundled locally
 
 ---
 
+## 📁 Project Structure
+
+```text
+quizcardgenerator/
+├── index.html               # Main entry point (at root for GitHub Pages)
+├── README.md                # Comprehensive documentation
+├── start_server.sh          # Helper script to launch local server (port 8088)
+├── stop_server.sh           # Helper script to stop local server
+├── css/
+│   └── styles.css           # UI design system, themes, and responsive layout
+└── js/
+    ├── app.js               # Application state, parsing logic, and card rendering
+    └── vendor/
+        ├── html2canvas.min.js  # High-resolution rasterizer (local bundle)
+        └── jspdf.umd.min.js    # Multi-page PDF generator (local bundle)
+```
+
+---
+
 ## 🌐 Deploying to GitHub Pages (`github.io`)
 
-1. Push this repository to GitHub:
+### Should the repository be Public or Private?
+> [!IMPORTANT]
+> **Set the repository to PUBLIC.**
+> 
+> - **Free GitHub accounts** only allow GitHub Pages hosting from **Public repositories**. If the repository is set to private on a free plan, the Pages feature cannot be enabled.
+> - **Security & Privacy**: QuizCardGen is a **100% client-side application** with zero backend, zero external databases, and zero secrets or API keys. Any quizzes you paste or edit are saved exclusively in your browser's private `localStorage`—nothing is ever uploaded to GitHub. Making the repo public is standard, completely safe, and 100% free forever.
+
+### Setup Instructions
+
+1. Push this repository to your GitHub account:
    ```bash
    git remote add origin https://github.com/<YOUR_USERNAME>/quizcardgenerator.git
    git push -u origin main
    ```
-2. On GitHub, navigate to **Settings** > **Pages**.
-3. Under **Build and deployment**, set Source to **Deploy from a branch** (`main` branch, `/ (root)` folder).
-4. Your application will be live at:
-   ```
+2. On GitHub, navigate to **Settings** > **Pages** (under "Code and automation" in the left sidebar).
+3. Under **Build and deployment**:
+   - **Source**: `Deploy from a branch`
+   - **Branch**: `main`
+   - **Folder**: `/ (root)`
+4. Click **Save**. Within 1–2 minutes, your web application will be live at:
+   ```text
    https://<YOUR_USERNAME>.github.io/quizcardgenerator/
    ```
 
@@ -93,6 +124,8 @@ Or open `index.html` directly in your browser (all libraries are bundled locally
 
 ## 🛠️ Tech Stack
 - **Pure Client-Side**: Vanilla HTML5, CSS3, JavaScript (ES6+).
-- **Libraries**:
+- **Zero Build Steps**: No Node.js build, bundler, or compilation needed. Runs anywhere instantly.
+- **Vendored Libraries**:
   - `html2canvas.min.js`: 1080×1080px lossless PNG rendering.
   - `jspdf.umd.min.js`: Multi-page 1080×1080px LinkedIn Document PDF generation with exact color matching.
+

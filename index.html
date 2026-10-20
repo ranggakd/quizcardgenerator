@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- html2canvas for 1-click high-resolution 1:1 PNG export (Offline local + CDN fallback) -->
-  <script src="html2canvas.min.js"></script>
+  <script src="js/vendor/html2canvas.min.js"></script>
   <script>
     if (typeof html2canvas === 'undefined') {
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>');
@@ -20,14 +20,14 @@
   </script>
 
   <!-- jsPDF for 1-click multi-page LinkedIn Document Carousel PDF export (Offline local + CDN fallback) -->
-  <script src="jspdf.umd.min.js"></script>
+  <script src="js/vendor/jspdf.umd.min.js"></script>
   <script>
     if (typeof window.jspdf === 'undefined') {
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
     }
   </script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="theme-obsidian">
 
@@ -1291,6 +1291,6 @@ Storing raw, unvalidated data directly in the Silver layer violates the Medallio
   </aside>
 
   <!-- Core Javascript Logic -->
-  <script src="app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
