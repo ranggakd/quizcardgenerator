@@ -4,6 +4,11 @@
  * theme management, and 1-click high-resolution PNG & multi-page PDF exports.
  */
 
+/**
+ * Semantic Version of QuizCardGen
+ */
+const APP_VERSION = 'v1.2.0';
+
 // Default State initialized with user's example & 8-slide educational quiz carousel structure
 const DEFAULT_STATE = {
   theme: 'theme-obsidian',
@@ -192,6 +197,19 @@ function initDOM() {
       swipeEl.innerText = appState[`liSwipe${i}`] || (DEFAULT_STATE[`liSwipe${i}`] || '');
     }
   }
+
+  // Bind Semantic Version into UI elements
+  document.querySelectorAll('.app-version-val').forEach(el => el.innerText = APP_VERSION);
+  const headerVersion = document.getElementById('appVersionHeader');
+  if (headerVersion) headerVersion.innerText = APP_VERSION;
+  const footerVersion = document.getElementById('footerAppVersion');
+  if (footerVersion) footerVersion.innerText = APP_VERSION;
+  const drawerVersion = document.getElementById('drawerAppVersion');
+  if (drawerVersion) drawerVersion.innerText = APP_VERSION;
+
+  // Set current year in footer
+  const footerYear = document.getElementById('footerYear');
+  if (footerYear) footerYear.innerText = new Date().getFullYear();
 
   // Sync drawer form inputs
   const topicInput = document.getElementById('globalTopicInput');
@@ -1582,6 +1600,52 @@ async function captureLinkedInSlideAsCanvas(slideId, targetSize = 1080) {
 }
 
 /**
+ * Generates an OS-safe timestamp without whitespace or forbidden characters.
+ * Format: YYYYMMDD_HHMMSS (e.g. 20261021_130627).
+ * Works reliably across Windows NTFS, macOS APFS, Linux, iOS, and Android.
+ */
+function getCrossPlatformTimestamp(date = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const hh = pad(date.getHours());
+  const min = pad(date.getMinutes());
+  const ss = pad(date.getSeconds());
+  return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+}
+
+/**
+ * Builds the default LinkedIn PDF export filename:
+ * <sanitized_category_tag>_<timestamp_without_whitespace>.pdf
+ * Example: data_architecture_20261021_130627.pdf
+ */
+function generateLinkedInPdfFilename(customName = null) {
+  let baseName = '';
+  if (customName && customName.trim() && customName.trim() !== 'medallion_architecture_quiz.pdf') {
+    baseName = customName
+      .trim()
+      .replace(/\.pdf$/i, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  if (!baseName) {
+    baseName = (appState.topic || 'quiz_carousel')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  // Ensure zero whitespace and valid filesystem characters
+  baseName = baseName.replace(/[\s_]+/g, '_').replace(/^_+|_+$/g, '') || 'quiz_carousel';
+  const timestamp = getCrossPlatformTimestamp();
+  return `${baseName}_${timestamp}.pdf`;
+}
+
+/**
  * Exports LinkedIn Document Carousel as an authentic multi-page PDF (1080x1080 per page)
  * Zero dependencies on server, 100% offline using jsPDF.umd.min.js + html2canvas.
  * Uses lossless PNGs for crystal clear text and exact color matching.
@@ -1616,8 +1680,8 @@ async function exportLinkedInPdf() {
       pdf.addImage(imgData, 'PNG', 0, 0, 1080, 1080, undefined, 'FAST');
     }
 
-    const docName = (appState.liDocFilename || 'medallion_architecture_quiz.pdf').replace(/\.pdf$/i, '');
-    const filename = `${docName}_carousel.pdf`;
+    // Generate OS-safe filename with category tag and cross-platform timestamp (zero whitespace)
+    const filename = generateLinkedInPdfFilename(appState.liDocFilename);
     pdf.save(filename);
 
     showToast(`🎉 Exported ${filename}! Ready to upload as LinkedIn Document post.`);

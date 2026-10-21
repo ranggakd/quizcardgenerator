@@ -1,4 +1,4 @@
-# QuizCardGen
+# QuizCardGen `v1.2.0`
 
 A modern, dark-theme 1:1 square quiz card and 8-slide LinkedIn Document Carousel generator. Built entirely with client-side vanilla web technologies for zero-dependency local use and instant GitHub Pages deployment.
 
@@ -119,6 +119,16 @@ quizcardgenerator/
    ```text
    https://<YOUR_USERNAME>.github.io/quizcardgenerator/
    ```
+
+---
+
+## 📄 Document Export Naming Convention
+PDF carousel exports automatically generate an OS-safe filename with the active category tag and an ISO date-time timestamp:
+```text
+<sanitized_category_tag>_<YYYYMMDD_HHMMSS>.pdf
+```
+- **Example**: `data_architecture_20261021_130627.pdf`
+- **Cross-Platform Safe**: Zero whitespace, only letters, numbers, and underscores (100% compliant with Windows NTFS, macOS APFS, and Linux ext4).
 
 ---
 

@@ -998,7 +998,8 @@ body.clean-screenshot-mode .app-header,
 body.clean-screenshot-mode .quick-toolbar,
 body.clean-screenshot-mode .card-action-bar,
 body.clean-screenshot-mode .card-toolbar,
-body.clean-screenshot-mode .single-nav-bar {
+body.clean-screenshot-mode .single-nav-bar,
+body.clean-screenshot-mode .app-site-footer {
   display: none !important;
 }
 
@@ -2712,4 +2713,137 @@ body.clean-screenshot-mode .main-workspace {
   .cards-grid.font-medium .card-text-content {
     font-size: 1.05rem;
   }
+}
+
+/* ==========================================================================
+   SEMANTIC VERSIONING BADGES
+   ========================================================================== */
+.brand-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-version-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.app-version-badge:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #ffffff;
+}
+
+.drawer-version-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: auto;
+}
+
+/* ==========================================================================
+   FOOTER (INSPIRED BY BASE64ED)
+   ========================================================================== */
+.app-site-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 2.25rem 1.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 4rem;
+  width: 100%;
+  background: rgba(7, 9, 14, 0.55);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.footer-link.highlight {
+  color: #34d399;
+}
+
+.footer-link.highlight:hover {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.footer-credit {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-credit strong {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.footer-credit a {
+  color: #38bdf8;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-credit a:hover {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+.footer-version-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
 }
