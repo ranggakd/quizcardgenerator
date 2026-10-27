@@ -7,7 +7,7 @@
 /**
  * Semantic Version of QuizCardGen
  */
-const APP_VERSION = 'v1.2.0';
+const APP_VERSION = 'v1.2.1';
 
 // Default State initialized with user's example & 8-slide educational quiz carousel structure
 const DEFAULT_STATE = {
@@ -1816,20 +1816,21 @@ function applySmartPaste() {
   });
 
   if (parsed.correctAnswer) {
-    appState.liRevealAnswer = parsed.correctAnswer;
-    appState.liRevealAnswerText = `CORRECT ANSWER: OPTION ${parsed.correctAnswer}`;
-    updateAnswerHighlight(parsed.correctAnswer);
+    updateRevealAnswer(parsed.correctAnswer);
+  } else {
+    renderSlide8();
   }
 
   saveState();
   initDOM();
   closePasteModal();
-  showToast('✓ Successfully updated question, options, and Slide 8 explanations!');
+  showToast(`✓ Updated question, options, and mapped Option ${parsed.correctAnswer || 'answers'}!`);
 }
 
 /**
  * Intelligent regex parser for questions, options A, B, C, D, and their respective explanations.
- * Automatically detects correct answer when phrases like "That's right!", "Correct", or "(right..." are found.
+ * Supports varied right and wrong keyword cues (e.g. "Right answer", "That's right!", "Not quite", "[Correct]", "✔", "Incorrect")
+ * with automatic cue stripping, distractor false-positive protection, and 3-wrong elimination logic.
  */
 function parseMultipleChoiceText(text) {
   const result = {
@@ -1841,6 +1842,37 @@ function parseMultipleChoiceText(text) {
 
   // Normalize line endings
   const clean = text.replace(/\r\n/g, '\n').trim();
+
+  // Standalone Right cue line
+  const standaloneRightRegex = /^(?:that'?s\s+right|that\s+is\s+right|it'?s\s+right|right\s+answer|correct\s+answer|correct|is\s+correct|best\s+answer|right|true|✓|✔|\[correct\]|\(correct\)|\(right\s+answer\)|\(that'?s\s+right\)|\[right\s+answer\]|\[right\]|\(right\)|\[best\s+answer\])[\s!:.]*$/i;
+  // Prefix Right cue (e.g. "Right answer: ...", "That's right! ...", "Correct: ...", "✔ ...")
+  const prefixRightRegex = /^(?:that'?s\s+right!?|that\s+is\s+right!?|it'?s\s+right!?|right\s+answer\s*[:\.-]?|correct\s+answer\s*[:\.-]?|correct\s*[:\.-]?|is\s+correct\s*[:\.-]?|best\s+answer\s*[:\.-]?|✓|✔)\s*[-:.]*\s*/i;
+  // Suffix/Inline Right cue on option statement line
+  const inlineRightRegex = /\s*(?:[\(\[](?:that'?s\s+right|right\s+answer|correct\s+answer|correct|true|right|best\s+answer|✓|✔)[\)\]]|\s*[-–—]\s*(?:that'?s\s+right|right\s+answer|correct\s+answer|correct|is\s+correct|best\s+answer)|\s*[✓✔])\s*$/i;
+  // Leading right tag on option statement line
+  const leadingRightTagRegex = /^(?:\[(?:correct|right|right\s+answer|best\s+answer)\]|\((?:correct|right|right\s+answer|best\s+answer)\)|[✓✔])\s*[-:.]*\s*/i;
+
+  // Standalone Wrong cue line
+  const standaloneWrongRegex = /^(?:not\s+quite|incorrect|wrong|wrong\s+answer|not\s+correct|is\s+incorrect|false|✗|✘|✕|❌|\[incorrect\]|\(incorrect\)|\(wrong\)|\(not\s+quite\)|\(wrong\s+answer\)|\(false\)|\[wrong\]|\[not\s+quite\])[\s!:.]*$/i;
+  // Prefix Wrong cue (e.g. "Not quite: ...", "Incorrect: ...", "Wrong - ...", "✗ ...")
+  const prefixWrongRegex = /^(?:not\s+quite!?|incorrect\s*[:\.-]?|wrong\s+answer\s*[:\.-]?|wrong\s*[:\.-]?|not\s+correct\s*[:\.-]?|is\s+incorrect\s*[:\.-]?|false\s*[:\.-]?|✗|✘|✕|❌)\s*[-:.]*\s*/i;
+  // Suffix/Inline Wrong cue on option statement line
+  const inlineWrongRegex = /\s*(?:[\(\[](?:not\s+quite|incorrect|wrong\s+answer|wrong|false|✗|✘|✕|❌)[\)\]]|\s*[-–—]\s*(?:not\s+quite|incorrect|wrong\s+answer|wrong|not\s+correct)|\s*[✗✘✕❌])\s*$/i;
+  // Leading wrong tag on option statement line
+  const leadingWrongTagRegex = /^(?:\[(?:incorrect|wrong|not\s+quite)\]|\((?:incorrect|wrong|not\s+quite)\)|[✗✘✕❌])\s*[-:.]*\s*/i;
+
+  // Meta commentary pattern to filter out
+  const metaCommentRegex = /^\s*[\(\[]?\s*(?:right\s+will\s+shown[^\)\]]*|explanation\s*:?|notes?\s*:?)\s*[\)\]]?\s*$/i;
+
+  // Standalone explicit answer declaration (e.g. "Answer: B" or "Correct answer: A")
+  const answerDeclarationRegex = /^(?:correct\s+answer|answer|ans|key)\s*[:\-]?\s*(?:option\s+)?([A-Da-d])\b[\s.]*$/i;
+
+  const optionStatus = {
+    A: { isRight: false, isWrong: false },
+    B: { isRight: false, isWrong: false },
+    C: { isRight: false, isWrong: false },
+    D: { isRight: false, isWrong: false }
+  };
 
   // Regex to locate option headers: e.g. "A.", "A)", "B.", "[A]", etc. at line beginnings
   const optionHeaderRegex = /(?:^|\n)[ \t]*(?:\(?([A-Da-d])[\.\)]|\b([A-Da-d])\s*[\.\:\-])[ \t]*(.*)/g;
@@ -1866,7 +1898,21 @@ function parseMultipleChoiceText(text) {
 
   if (validMatches.length >= 2) {
     // 1. Question is everything preceding the first option header
-    const questionText = clean.substring(0, validMatches[0].startIndex).trim();
+    let questionText = clean.substring(0, validMatches[0].startIndex).trim();
+
+    // Check for explicit answer declaration in question text header
+    const qAnswerMatch = questionText.match(/(?:^|\n)\s*(?:correct\s+answer|answer|ans|key)\s*[:\-]?\s*(?:option\s+)?([A-Da-d])\b/i);
+    if (qAnswerMatch) {
+      const declaredLetter = qAnswerMatch[1].toUpperCase();
+      if (optionStatus[declaredLetter]) {
+        optionStatus[declaredLetter].isRight = true;
+      }
+      questionText = questionText.replace(/(?:^|\n)\s*(?:correct\s+answer|answer|ans|key)\s*[:\-]?\s*(?:option\s+)?[A-Da-d]\b[\s.]*$/i, '').trim();
+    }
+
+    // Strip leading question number/label (e.g. "1. ", "Question 1:", "Q.")
+    questionText = questionText.replace(/^(?:Q(?:uestion)?\s*\d*[:\.-]?|\d+[\.\)])\s*/i, '').trim();
+
     if (questionText) {
       result.question = questionText;
     }
@@ -1879,14 +1925,14 @@ function parseMultipleChoiceText(text) {
 
       // Split rawBlock into lines
       const allLines = rawBlock.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      
+
       // Remove the option letter marker line if it was standalone (e.g. "A.")
       let contentLines = [];
       if (allLines.length > 0) {
         if (/^\(?[A-Da-d][\.\)]\s*$/i.test(allLines[0])) {
           contentLines = allLines.slice(1);
         } else {
-          const stripped = allLines[0].replace(/^\(?[A-Da-d][\.\)]\s*/i, '').trim();
+          const stripped = allLines[0].replace(/^\(?[A-Da-d][\.\:\-]\s*/i, '').trim();
           contentLines = [stripped, ...allLines.slice(1)];
         }
       }
@@ -1896,36 +1942,77 @@ function parseMultipleChoiceText(text) {
       }
 
       // First non-empty content line is the option statement
-      const optionStatement = contentLines[0];
+      let optionStatement = contentLines[0];
+
+      // Check for leading or trailing cue tags on the option statement
+      if (leadingRightTagRegex.test(optionStatement)) {
+        optionStatus[current.letter].isRight = true;
+        optionStatement = optionStatement.replace(leadingRightTagRegex, '').trim();
+      } else if (leadingWrongTagRegex.test(optionStatement)) {
+        optionStatus[current.letter].isWrong = true;
+        optionStatement = optionStatement.replace(leadingWrongTagRegex, '').trim();
+      }
+
+      if (inlineRightRegex.test(optionStatement)) {
+        optionStatus[current.letter].isRight = true;
+        optionStatement = optionStatement.replace(inlineRightRegex, '').trim();
+      } else if (inlineWrongRegex.test(optionStatement)) {
+        optionStatus[current.letter].isWrong = true;
+        optionStatement = optionStatement.replace(inlineWrongRegex, '').trim();
+      }
+
       result.options[current.letter] = optionStatement;
 
       // Remaining lines form the explanation and/or correct indicators
       const remainingLines = contentLines.slice(1);
-      if (remainingLines.length > 0) {
-        // Check for affirmative indicators (e.g. "That's right!", "Correct", "(right will shown...")
-        const affirmativeRegex = /that's right|that is right|correct|is right|right answer|right will shown|✓|✔/i;
-        let isCorrectOption = false;
+      const cleanedExpLines = [];
 
-        for (const line of remainingLines) {
-          if (affirmativeRegex.test(line)) {
-            isCorrectOption = true;
-            break;
+      for (let j = 0; j < remainingLines.length; j++) {
+        const line = remainingLines[j].trim();
+        if (!line) continue;
+        if (metaCommentRegex.test(line)) continue;
+
+        // Check for answer declaration line (e.g. "Answer: A" at the end of block)
+        const declMatch = line.match(answerDeclarationRegex);
+        if (declMatch) {
+          const declLetter = declMatch[1].toUpperCase();
+          if (optionStatus[declLetter]) {
+            optionStatus[declLetter].isRight = true;
           }
+          continue;
         }
 
-        if (isCorrectOption) {
-          result.correctAnswer = current.letter;
+        // Check standalone right/wrong cues (strip line completely)
+        if (standaloneRightRegex.test(line)) {
+          optionStatus[current.letter].isRight = true;
+          continue;
+        }
+        if (standaloneWrongRegex.test(line)) {
+          optionStatus[current.letter].isWrong = true;
+          continue;
         }
 
-        // Clean up any internal meta commentary like "(right will shown, wrong never)"
-        const cleanExplanation = remainingLines
-          .filter(l => !/^\(?right will shown[^\)]*\)?$/i.test(l))
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
+        // Check prefix right/wrong cues (strip cue prefix, keep rest of sentence)
+        if (prefixRightRegex.test(line)) {
+          optionStatus[current.letter].isRight = true;
+          const cleanedLine = line.replace(prefixRightRegex, '').trim();
+          if (cleanedLine) cleanedExpLines.push(cleanedLine);
+          continue;
+        }
+        if (prefixWrongRegex.test(line)) {
+          optionStatus[current.letter].isWrong = true;
+          const cleanedLine = line.replace(prefixWrongRegex, '').trim();
+          if (cleanedLine) cleanedExpLines.push(cleanedLine);
+          continue;
+        }
 
-        result.explanations[current.letter] = cleanExplanation;
+        cleanedExpLines.push(line);
       }
+
+      result.explanations[current.letter] = cleanedExpLines
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
   } else {
     // Fallback: 4-paragraph split if no letter prefixes
@@ -1938,6 +2025,21 @@ function parseMultipleChoiceText(text) {
       if (paragraphs.length > 4) {
         result.question = paragraphs.slice(0, paragraphs.length - 4).join(' ').trim();
       }
+    }
+  }
+
+  // Determine correct answer:
+  // 1. Explicit right cues take highest precedence
+  const rightLetters = ['A', 'B', 'C', 'D'].filter(l => optionStatus[l].isRight);
+  const wrongLetters = ['A', 'B', 'C', 'D'].filter(l => optionStatus[l].isWrong);
+
+  if (rightLetters.length > 0) {
+    result.correctAnswer = rightLetters[0];
+  } else if (wrongLetters.length === 3) {
+    // 2. Elimination: exactly 3 options are explicitly marked wrong, so the remaining 1 is correct!
+    const candidate = ['A', 'B', 'C', 'D'].find(l => !optionStatus[l].isWrong && result.options[l]);
+    if (candidate) {
+      result.correctAnswer = candidate;
     }
   }
 

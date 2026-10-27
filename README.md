@@ -1,4 +1,4 @@
-# QuizCardGen `v1.2.0`
+# QuizCardGen `v1.2.1`
 
 A modern, dark-theme 1:1 square quiz card and 8-slide LinkedIn Document Carousel generator. Built entirely with client-side vanilla web technologies for zero-dependency local use and instant GitHub Pages deployment.
 
@@ -32,6 +32,24 @@ Storing raw, unvalidated data directly in the Silver layer violates the Medallio
 ```
 
 ---
+
+
+### 🧠 Smart Cue Detection & Elimination
+
+QuizCardGen features a fault-tolerant natural language cue detector that maps Option A, B, C, or D directly to the correct answer:
+
+- **Affirmative Cues (Winner)**:
+  - Standalone lines: `Right answer`, `That's right!`, `Correct`, `Best answer`, `True`, `✔`, `✓`
+  - Prefix cues: `Right answer: ...`, `That's right! ...`, `Correct - ...`
+  - Inline/Bracketed cues: `A. Forward compatibility [Correct]`, `A. Option ✔`, `A. Option (Right answer)`
+  - Header / Trailer cues: `Answer: A`, `Key: B`, `Ans: C`
+- **Distractor Cues (Traps)**:
+  - Standalone lines: `Not quite`, `Incorrect`, `Wrong`, `Wrong answer`, `False`, `✗`, `❌`
+  - Prefix cues: `Not quite. ...`, `Incorrect: ...`, `Wrong - ...`
+  - Inline/Bracketed cues: `C. Option [Incorrect]`, `C. Option ✗`, `C. Option (Not quite)`
+- **Elimination Inference**: If 3 options are flagged with wrong cues, QuizCardGen automatically deduces the 4th option as the winning answer!
+- **False-Positive Immunity**: Occurrences of the word "correct" inside standard explanatory sentences (e.g., *"This does not produce the correct calculation"*) are safely ignored and will never cause accidental false-positive flips.
+- **Clean Cue Stripping**: All standalone cues and prefix tags are stripped from the resulting explanation text so your carousel slides remain polished and publication-ready.
 
 ### 🗺️ Dynamic vs. Template Mapping Architecture
 

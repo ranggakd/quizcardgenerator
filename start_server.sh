@@ -10,8 +10,7 @@ if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
 fi
 
 echo "🚀 Starting QuizCardGen on http://localhost:$PORT ..."
-(python3 -m http.server $PORT </dev/null >/dev/null 2>&1 &)
-disown
+nohup python3 -m http.server $PORT >/dev/null 2>&1 &
 
 sleep 0.8
 if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
